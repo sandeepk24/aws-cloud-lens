@@ -1,0 +1,21 @@
+# Optional local overrides — copy next to docker-compose.yml as
+# docker-compose.override.yml (Compose loads it automatically).
+
+services:
+  api:
+    volumes:
+      - ./backend/cloudlens-api/app:/app/app:ro
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  ui:
+    build:
+      context: ./frontend/cloudlens-ui
+    # Prefer the Vite dev server locally instead of nginx:
+    # image: node:20-alpine
+    # working_dir: /app
+    # command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    # ports:
+    #   - "5173:5173"
+    # volumes:
+    #   - ./frontend/cloudlens-ui:/app
+    #   - /app/node_modules
