@@ -1,0 +1,80 @@
+{
+  "label": "after-run1",
+  "env": {
+    "python": "3.14.6",
+    "platform": "macOS-15.7.7-arm64-arm-64bit-Mach-O",
+    "sqlalchemy": "2.1.9",
+    "db": "sqlite (file, local)"
+  },
+  "orchestration_relationships": {
+    "instances": 2000,
+    "edges_per_instance": 3,
+    "status": "succeeded",
+    "relationships_persisted": 6000,
+    "elapsed_ms": 1068.2,
+    "sql_statements_total": 148,
+    "sql_select_statements": 85
+  },
+  "mark_stale_large_scope": {
+    "resources_in_scope": 40000,
+    "status": "succeeded",
+    "stale_marked": 0,
+    "stale_update_ms": 14.84,
+    "stale_update_bind_params": 7,
+    "full_run_ms": 6817.1,
+    "note": "PostgreSQL rejects >65535 bind params; not testable locally (no Postgres)."
+  },
+  "client_construction": {
+    "calls": 100,
+    "n": 100,
+    "p50_ms": 0.0,
+    "p95_ms": 0.001,
+    "mean_ms": 0.146,
+    "total_ms": 14.6
+  },
+  "s3_api_calls": {
+    "regions": 3,
+    "buckets": 60,
+    "buckets_collected": 60,
+    "api_calls": {
+      "list_buckets": 3,
+      "get_bucket_versioning": 60,
+      "get_bucket_encryption": 60,
+      "get_public_access_block": 60,
+      "get_bucket_ownership_controls": 60
+    },
+    "api_calls_total": 243
+  },
+  "retry_amplification": {
+    "app_level_attempts_per_page": 25,
+    "botocore_max_attempts_config": 3,
+    "worst_case_http_requests_per_page": 75
+  },
+  "api_latency": {
+    "resources_seeded": 20000,
+    "counts_all": {
+      "n": 200,
+      "p50_ms": 33.702,
+      "p95_ms": 58.46,
+      "mean_ms": 37.184
+    },
+    "counts_filtered": {
+      "n": 200,
+      "p50_ms": 8.99,
+      "p95_ms": 12.397,
+      "mean_ms": 10.088
+    },
+    "list_limit100": {
+      "n": 200,
+      "p50_ms": 4.472,
+      "p95_ms": 5.052,
+      "mean_ms": 4.744
+    },
+    "list_filtered_offset": {
+      "n": 200,
+      "p50_ms": 12.259,
+      "p95_ms": 16.799,
+      "mean_ms": 13.145
+    }
+  }
+}
