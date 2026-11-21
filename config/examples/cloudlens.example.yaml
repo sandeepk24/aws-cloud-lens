@@ -1,0 +1,27 @@
+# AWS CloudLens — application example configuration
+# Account IDs, regions, roles, and profiles live in the accounts YAML
+# (see ../accounts.example.yaml), not here.
+
+app:
+  name: cloudlens
+  environment: development
+  log_level: INFO
+
+api:
+  host: 0.0.0.0
+  port: 8000
+  cors_origins:
+    - http://localhost:5173
+    - http://localhost:3000
+
+database:
+  # Prefer DATABASE_URL from the environment in production.
+  url: postgresql+psycopg://cloudlens:cloudlens@localhost:5432/cloudlens
+
+accounts:
+  # Absolute or repo-relative path; overridden by CLOUDLENS_CONFIG_PATH.
+  config_path: ./config/accounts.yaml
+
+analytics:
+  enabled: true
+  pipelines: []

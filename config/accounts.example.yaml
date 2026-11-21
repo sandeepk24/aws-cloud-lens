@@ -1,0 +1,124 @@
+# AWS CloudLens — account configuration example
+#
+# Copy to a private path (e.g. config/accounts.yaml) and replace placeholders.
+# Do NOT commit real account IDs, role ARNs, or profile names.
+#
+# Point the API at your file:
+#   export CLOUDLENS_CONFIG_PATH=/absolute/or/relative/path/to/accounts.yaml
+#
+# Schema: config/schemas/accounts.schema.json
+
+version: "1"
+
+# Boto3 service names — supplied via config (not hardcoded in Python).
+aws_api:
+  sts_service_name: sts
+  ec2_service_name: ec2
+  elbv2_service_name: elbv2
+  ecs_service_name: ecs
+  eks_service_name: eks
+  rds_service_name: rds
+  s3_service_name: s3
+  wafv2_service_name: wafv2
+  route53_service_name: route53
+  logs_service_name: logs
+  # Optional — required only when the matching collectors are enabled.
+  lambda_service_name: lambda
+  cloudfront_service_name: cloudfront
+  apigateway_service_name: apigateway
+  apigatewayv2_service_name: apigatewayv2
+  # Control-plane region for Route 53 and CloudFront-scope WAFv2 (config-driven).
+  global_control_region: REPLACE_WITH_GLOBAL_CONTROL_REGION
+  # Used when GetBucketLocation returns an empty LocationConstraint.
+  s3_default_region: REPLACE_WITH_S3_DEFAULT_REGION
+  # Optional LocationConstraint aliases, e.g. EU: eu-west-1
+  s3_location_constraint_map: {}
+
+
+projects:
+  - alias: example-project
+    description: "Replace with your project alias and description"
+    accounts:
+      # --- Auth via named AWS shared-credentials / SSO profile ---
+      - alias: example-account-profile
+        account_id: "000000000000"
+        regions:
+          - REPLACE_WITH_REGION
+        collectors:
+          enabled:
+            - network.vpc
+            - network.subnet
+            - network.route_table
+            - network.internet_gateway
+            - network.nat_gateway
+            - network.vpc_endpoint
+            - network.security_group
+            - network.network_acl
+            - network.eni
+            - compute.ec2_instance
+            - compute.ebs_volume
+            - compute.elastic_ip
+            - elbv2.load_balancer
+            - elbv2.listener
+            - elbv2.listener_rule
+            - elbv2.target_group
+            - elbv2.target_health
+            - ecs.cluster
+            - ecs.service
+            - ecs.task_definition
+            - ecs.task
+            - eks.cluster
+            - eks.node_group
+            - eks.fargate_profile
+            - rds.db_instance
+            - rds.db_cluster
+            - rds.db_subnet_group
+            - lambda.function
+            - apigateway.rest_api
+            - apigatewayv2.api
+            - cloudfront.distribution
+            - s3.bucket
+            - wafv2.web_acl_regional
+            - wafv2.web_acl_cloudfront
+            - route53.hosted_zone
+            - route53.record
+            - logs.log_group
+        auth:
+          type: profile
+          profile: REPLACE_WITH_AWS_PROFILE
+        # Optional read-only Kubernetes workload discovery (needs the optional
+        # 'kubernetes' Python package and get/list RBAC; see
+        # app/collectors/kubernetes/adapter.py). Omit to skip.
+        # kubernetes:
+        #   clusters:
+        #     - eks_cluster_name: REPLACE_WITH_EKS_CLUSTER
+        #       region: REPLACE_WITH_REGION
+        #       kubeconfig_context: REPLACE_WITH_KUBE_CONTEXT
+
+      # --- Auth via STS AssumeRole ---
+      - alias: example-account-assume-role
+        account_id: "000000000000"
+        regions:
+          - REPLACE_WITH_REGION
+          - REPLACE_WITH_ANOTHER_REGION
+        collectors:
+          enabled:
+            - network.vpc
+            - compute.ec2_instance
+            - elbv2.load_balancer
+            - ecs.cluster
+            - eks.cluster
+            - rds.db_instance
+            - s3.bucket
+            - wafv2.web_acl_regional
+            - route53.hosted_zone
+            - logs.log_group
+        auth:
+          type: assume_role
+          role_arn: "arn:aws:iam::000000000000:role/REPLACE_WITH_ROLE_NAME"
+          # Optional fields:
+          # external_id: REPLACE_WITH_EXTERNAL_ID
+          # session_name: REPLACE_WITH_SESSION_NAME
+          # source_profile: REPLACE_WITH_SOURCE_PROFILE
+          # duration_seconds: 3600
+          # sts_region: REPLACE_WITH_STS_REGION

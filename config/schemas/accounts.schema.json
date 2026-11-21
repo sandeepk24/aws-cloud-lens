@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cloudlens.local/schemas/accounts.schema.json",
+  "title": "AWS CloudLens Accounts Configuration",
+  "description": "External YAML/JSON configuration for projects, accounts, regions, collectors, and AWS authentication.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "aws_api",
+    "projects"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1",
+      "description": "Configuration schema version."
+    },
+    "aws_api": {
+      "$ref": "#/$defs/awsApi"
+    },
+    "projects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/project"
+      }
+    }
+  },
+  "$defs": {
+    "awsApi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sts_service_name",
+        "ec2_service_name",
+        "elbv2_service_name",
+        "ecs_service_name",
+        "eks_service_name",
+        "rds_service_name",
+        "s3_service_name",
+        "wafv2_service_name",
+        "route53_service_name",
+        "logs_service_name",
+        "global_control_region",
+        "s3_default_region"
+      ],
+      "properties": {
+        "sts_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for STS (AssumeRole / GetCallerIdentity)."
+        },
+        "ec2_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for EC2 network inventory APIs."
+        },
+        "elbv2_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for Elastic Load Balancing v2 APIs."
+        },
+        "ecs_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for ECS inventory APIs."
+        },
+        "eks_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for EKS inventory APIs (control plane only)."
+        },
+        "rds_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for RDS/Aurora inventory APIs."
+        },
+        "s3_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for S3 inventory APIs."
+        },
+        "wafv2_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for WAFv2 inventory APIs."
+        },
+        "route53_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for Route 53 inventory APIs."
+        },
+        "logs_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for CloudWatch Logs inventory APIs."
+        },
+        "global_control_region": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Region for global control-plane APIs (Route 53, CloudFront-scope WAFv2)."
+        },
+        "s3_default_region": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Region used when S3 LocationConstraint is empty."
+        },
+        "s3_location_constraint_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Optional S3 LocationConstraint → region aliases."
+        },
+        "lambda_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for Lambda (required when lambda.* collectors are enabled)."
+        },
+        "cloudfront_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for CloudFront (required when cloudfront.* collectors are enabled)."
+        },
+        "apigateway_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for API Gateway REST APIs (required for apigateway.*)."
+        },
+        "apigatewayv2_service_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Boto3 service name for API Gateway HTTP/WebSocket APIs (required for apigatewayv2.*)."
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alias",
+        "accounts"
+      ],
+      "properties": {
+        "alias": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "description": "Stable project alias used by CloudLens."
+        },
+        "description": {
+          "type": "string"
+        },
+        "accounts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/account"
+          }
+        }
+      }
+    },
+    "account": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alias",
+        "account_id",
+        "regions",
+        "collectors",
+        "auth"
+      ],
+      "properties": {
+        "alias": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "description": "Stable account alias within the project."
+        },
+        "account_id": {
+          "type": "string",
+          "pattern": "^[0-9]{12}$",
+          "description": "12-digit AWS account ID (from config only; never hardcoded in source)."
+        },
+        "regions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "description": "AWS region code supplied by configuration."
+          }
+        },
+        "collectors": {
+          "$ref": "#/$defs/collectors"
+        },
+        "auth": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/profileAuth"
+            },
+            {
+              "$ref": "#/$defs/assumeRoleAuth"
+            }
+          ]
+        },
+        "kubernetes": {
+          "$ref": "#/$defs/kubernetes"
+        }
+      }
+    },
+    "collectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Collector identifier enabled for this account."
+          }
+        }
+      }
+    },
+    "profileAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "profile"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "profile"
+        },
+        "profile": {
+          "type": "string",
+          "minLength": 1,
+          "description": "AWS shared config / SSO profile name."
+        }
+      }
+    },
+    "assumeRoleAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "role_arn"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "assume_role"
+        },
+        "role_arn": {
+          "type": "string",
+          "minLength": 20,
+          "pattern": "^arn:[^:]+:iam::[0-9]{12}:role/.+$",
+          "description": "IAM role ARN to assume via STS."
+        },
+        "external_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "session_name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "source_profile": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional profile used as the identity that calls AssumeRole."
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 900,
+          "maximum": 43200
+        },
+        "sts_region": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional region for the STS endpoint; defaults to the first account region at runtime."
+        }
+      }
+    },
+    "kubernetes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional read-only Kubernetes workload discovery (EKS).",
+      "properties": {
+        "clusters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "eks_cluster_name",
+              "region",
+              "kubeconfig_context"
+            ],
+            "properties": {
+              "eks_cluster_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "region": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kubeconfig_context": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kubeconfig_path": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
