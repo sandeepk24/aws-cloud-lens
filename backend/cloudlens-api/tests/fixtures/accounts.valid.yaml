@@ -1,0 +1,51 @@
+version: "1"
+
+aws_api:
+  sts_service_name: sts
+  ec2_service_name: ec2
+  elbv2_service_name: elbv2
+  ecs_service_name: ecs
+  eks_service_name: eks
+  rds_service_name: rds
+  s3_service_name: s3
+  wafv2_service_name: wafv2
+  route53_service_name: route53
+  logs_service_name: logs
+  global_control_region: test-region-global
+  s3_default_region: test-region-a
+  s3_location_constraint_map:
+    EU: test-region-eu
+
+
+projects:
+  - alias: demo-project
+    description: "Fixture project for unit tests"
+    accounts:
+      - alias: profile-account
+        account_id: "111122223333"
+        regions:
+          - test-region-a
+        collectors:
+          enabled:
+            - inventory.compute
+        auth:
+          type: profile
+          profile: test-profile
+
+      - alias: role-account
+        account_id: "444455556666"
+        regions:
+          - test-region-b
+          - test-region-c
+        collectors:
+          enabled:
+            - inventory.compute
+            - inventory.storage
+        auth:
+          type: assume_role
+          role_arn: "arn:aws:iam::444455556666:role/TestReadOnly"
+          external_id: test-external-id
+          session_name: cloudlens-test
+          source_profile: test-source-profile
+          duration_seconds: 3600
+          sts_region: test-region-b

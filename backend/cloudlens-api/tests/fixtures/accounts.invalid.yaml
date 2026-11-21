@@ -1,0 +1,13 @@
+version: "1"
+
+projects:
+  - alias: broken
+    accounts:
+      - alias: missing-auth-fields
+        account_id: "not-an-account-id"
+        regions: []
+        collectors:
+          enabled: []
+        auth:
+          type: profile
+          profile: ""
